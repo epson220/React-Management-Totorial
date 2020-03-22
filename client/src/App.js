@@ -9,7 +9,7 @@ import TableCell from '@material-ui/core/TableCell';
 import { withStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import CustomerAdd from './components/CustomerAdd';
 
 const styles = theme => ({
   root : {
@@ -27,9 +27,20 @@ const styles = theme => ({
 
 class App extends Component {
 
-  state = {
-    customers: "",
-    completed: 0
+  constructor(props) {
+    super(props);
+    this.state = {
+      customers: '',
+      completed: 0
+    }
+  }
+
+  stateRefresh = () => {
+    this.setState({
+      customers: '',
+      completed: 0
+    });
+    this.callApi().then(res=>this.setState({customers:res})).catch(err=> console.log(err));
   }
 
   componentDidMount() {
@@ -51,6 +62,7 @@ class App extends Component {
   render() {
     const { classes } = this.props;
     return (
+      <div>
       <Paper className={classes.root}>
         <Table className={classes.table}>
           <TableHead>
@@ -61,11 +73,12 @@ class App extends Component {
               <TableCell>생일</TableCell>
               <TableCell>성별</TableCell>
               <TableCell>직업</TableCell>
+              <TableCell>설정</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
           {this.state.customers ? this.state.customers.map(c => {
-            return (<Customer key={c.id} id={c.id} image={c.image} name={c.name} birthday={c.birthday} gender={c.gender} job={c.job}></Customer>);
+            return (<Customer stateRefresh={this.stateRefresh} key={c.id} id={c.id} image={c.image} name={c.name} birthday={c.birthday} gender={c.gender} job={c.job}></Customer>);
           }) : <TableRow> 
               <TableCell colSpan="6" align="center">
                 <CircularProgress className={classes.progess} variant="determinate" value={this.state.completed}></CircularProgress>
@@ -74,6 +87,8 @@ class App extends Component {
           </TableBody>
         </Table>
       </Paper>
+      <CustomerAdd stateRefresh={this.stateRefresh}></CustomerAdd>
+      </div>
     );
   }
 }
